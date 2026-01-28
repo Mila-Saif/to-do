@@ -1,5 +1,5 @@
 'use client'
-import { CircleCheckBig, Plus }from 'lucide-react';
+import { CircleCheckBig, Plus, Circle }from 'lucide-react';
 import { useState } from 'react';
 
 
@@ -13,13 +13,28 @@ export default function Home() {
     const newTask = {
       id: crypto.randomUUID(),
       text: taskInput,
-      completed: false,
+      completed: false, 
 
     }
     setTaskInput('');
     setTodos([...todos, newTask]);
     
   }
+
+  const handleToggleTask = (id: string) => {
+    const newTodos = todos.map((todo) => {
+      if (todo.id === id) {
+        return {
+          ...todo,
+          completed: !todo.completed,
+        }
+      }
+      return todo;
+    });
+    setTodos(newTodos);
+
+  }
+ 
 
   
 
@@ -101,9 +116,25 @@ export default function Home() {
 
           </form>
 
-           <ul>
+           <ul className='mt-9 flex flex-col gap-3'  >
+  
             {todos.map((todo) => (
-              <li key={todo.id.toString()}>{todo.text}</li>
+              <li className= {` flex items-center p-4 rounded-lg border cursor-pointer `}
+              
+              
+                onClick={() => handleToggleTask(todo.id)} key={todo.id.toString()}>
+                <div>
+                  {todo.completed ? (
+                  <CircleCheckBig className='w-4 h-4 ' />
+                ) : (
+                  <Circle className='w-4 h-4' />
+                
+                )}</div>
+                <span ></span>
+                <span className={ `pl-2 ${todo.completed ? 'line-through' : ''}`}>{todo.text}</span>
+
+             
+              </li>
             ))}
            </ul>
         </div>
