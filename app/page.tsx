@@ -10,6 +10,7 @@ export default function Home() {
   const [todos, setTodos] = useState<{id: string, text: string, completed:boolean, priority: string}[]>([]);
   const [priority, setPriority] = useState('meduim');
   const [isModaleOpen, setIsModaleOpen] = useState(false);
+  const [filter, setFilter] = useState('all');
 
   const handleSaveTask= () => {
     if (!taskInput.trim()) return;
@@ -27,7 +28,7 @@ export default function Home() {
   }
 
   const handleToggleTask = (id: string) => {
-    const newTodos = todos.map((todo) => {
+    const newTodos = filterTodos.map((todo) => {
       if (todo.id === id) {
         return {
           ...todo,
@@ -45,6 +46,17 @@ export default function Home() {
     setTodos(newTodos);
   }
 
+  const filterTodos = todos.filter((todo) => {
+    if (filter === 'active') {
+      return !todo.completed;
+    }else if (filter === 'done') {
+      return todo.completed;
+    }else {
+      return true;
+    }
+  
+      
+    });
 
  
 
@@ -81,9 +93,17 @@ export default function Home() {
         </div>
 
         <div className='flex items-center pt-5 pb-4 gap-8  mb-6'>
-          <button className=' text-sm font-bold  border-b-2 border-blue-500 -mb-px' >All</button>
-          <button>Active</button>
-          <button>Done</button>
+
+          <button onClick={() => setFilter('all')} 
+          className={`text-sm font-bold  border-b-2 ${filter === 'all' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >All</button>
+
+
+          <button onClick={() => setFilter('active')} 
+          className={`text-sm font-bold  border-b-2 ${filter === 'active' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >Active</button>
+
+
+          <button onClick={() => setFilter('done')} 
+          className={`text-sm font-bold  border-b-2 ${filter === 'done' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >Done</button>
 
         </div>
 
