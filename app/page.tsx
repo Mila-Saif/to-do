@@ -8,6 +8,7 @@ import { useState } from 'react';
 export default function Home() {
   const [taskInput, setTaskInput] = useState('');
   const [todos, setTodos] = useState<{id: string, text: string, completed:boolean;}[]>([]);
+  const [filter, setFilter] = useState('all');
 
   const handleSaveTask= () => {
     const newTask = {
@@ -39,6 +40,8 @@ export default function Home() {
     const newTodos = todos.filter((todo) => todo.id !== id);
     setTodos(newTodos);
   }
+
+
  
 
   
@@ -87,20 +90,6 @@ export default function Home() {
 
 
 
-        {/* the add button  */}
-
-        <div className='absolute right-10 bottom-10'>
-          <button className='bg-white
-          border-2 border-transparent hover:border text-black font-bold py-2 px-4 rounded-full'>
-            <Plus className='w-8 h-8' width={54} height={54}/>
-          </button>
-          
-        
-        </div>
-
-
-
-        {/* close the add button */}
         {/* the add card */}
 
         <div className='wrapper'>
