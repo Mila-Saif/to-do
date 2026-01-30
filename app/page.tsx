@@ -1,5 +1,5 @@
 'use client'
-import { CircleCheckBig, Plus, Circle }from 'lucide-react';
+import { CircleCheckBig, Plus, Circle, Trash }from 'lucide-react';
 import { useState } from 'react';
 
 
@@ -33,6 +33,11 @@ export default function Home() {
     });
     setTodos(newTodos);
 
+  }
+
+  const handleDeleteTask = (id: string) => {
+    const newTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(newTodos);
   }
  
 
@@ -99,13 +104,13 @@ export default function Home() {
         {/* the add card */}
 
         <div className='wrapper'>
-          <form className='relative' onSubmit={(e) => {
+          <form className='flex items-center border rounded-lg overflow-hidden focus-within:ring-2 ring-blue-500'  onSubmit={(e) => {
             e.preventDefault();
             handleSaveTask();
           }}>
-            <input className='w-full p-2 border border-gray-300 rounded' type="text"
+            <input className='w-full p-2 outline-none border-non text-gray-400' type="text"
               placeholder='Enter your task' value={taskInput} onChange={(e) => setTaskInput(e.target.value)}/>
-           <button className='absolute top-0 right-0 bg-blue-500 hover:bg-blue-700 text-white font-bold  py-2 px-4 rounded'
+           <button className='  bg-blue-500 hover:bg-blue-700 text-white font-bold  py-2 px-4 rounded'
         
              
            
@@ -119,7 +124,7 @@ export default function Home() {
            <ul className='mt-9 flex flex-col gap-3'  >
   
             {todos.map((todo) => (
-              <li className= {` flex items-center p-4 rounded-lg border cursor-pointer `}
+              <li className= {` flex items-center p-4 rounded-lg border border-slate-500 cursor-pointer `}
               
               
                 onClick={() => handleToggleTask(todo.id)} key={todo.id.toString()}>
@@ -130,8 +135,19 @@ export default function Home() {
                   <Circle className='w-4 h-4' />
                 
                 )}</div>
-                <span ></span>
+                
                 <span className={ `pl-2 ${todo.completed ? 'line-through' : ''}`}>{todo.text}</span>
+
+                <button className='ml-auto' onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteTask(todo.id);
+                }}
+                
+                 
+
+                >
+                  <Trash className='w-4 h-4 hover:text-red-700' />
+                </button>
 
              
               </li>
