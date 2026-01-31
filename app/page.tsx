@@ -28,7 +28,7 @@ export default function Home() {
   }
 
   const handleToggleTask = (id: string) => {
-    const newTodos = filterTodos.map((todo) => {
+    const newTodos = todos.map((todo) => {
       if (todo.id === id) {
         return {
           ...todo,
@@ -93,6 +93,8 @@ export default function Home() {
         </div>
 
         <div className='flex items-center pt-5 pb-4 gap-8  mb-6'>
+
+
 
           <button onClick={() => setFilter('all')} 
           className={`text-sm font-bold  border-b-2 ${filter === 'all' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >All</button>
@@ -186,8 +188,10 @@ export default function Home() {
      
 
            <ul className='mt-9 flex flex-col gap-3'  >
+
   
-            {todos.map((todo) => (
+            {filterTodos.map((todo) => (
+              
               <li className= {` flex items-center p-4 rounded-lg border border-slate-500 cursor-pointer `}
               
               
