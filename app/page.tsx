@@ -8,7 +8,7 @@ import { useState } from 'react';
 export default function Home() {
   const [taskInput, setTaskInput] = useState('');
   const [todos, setTodos] = useState<{id: string, text: string, completed:boolean, priority: string}[]>([]);
-  const [priority, setPriority] = useState('meduim');
+  const [priority, setPriority] = useState('medium');
   const [isModaleOpen, setIsModaleOpen] = useState(false);
   const [filter, setFilter] = useState('all');
 
@@ -23,7 +23,7 @@ export default function Home() {
       }
     setTaskInput('');
     setTodos([...todos, newTask]);
-    setPriority('meduim');
+    setPriority('medium');
     
   }
 
@@ -33,6 +33,7 @@ export default function Home() {
         return {
           ...todo,
           completed: !todo.completed,
+          
         }
       }
       return todo;
@@ -51,6 +52,14 @@ export default function Home() {
       return !todo.completed;
     }else if (filter === 'done') {
       return todo.completed;
+    }else if (filter === 'high') {
+      return todo.priority === "high";
+    }else if (filter === 'medium') {
+      return todo.priority === "medium";
+    }else if (filter === 'low') {
+      return todo.priority === "low";
+
+    
     }else {
       return true;
     }
@@ -106,6 +115,21 @@ export default function Home() {
 
           <button onClick={() => setFilter('done')} 
           className={`text-sm font-bold  border-b-2 ${filter === 'done' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >Done</button>
+
+
+          <button onClick={() => setFilter('high')} 
+          className={`text-sm font-bold  border-b-2 ${filter === 'high' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >High</button>
+
+
+          <button onClick={() => setFilter('medium')} 
+          className={`text-sm font-bold  border-b-2 ${filter === 'medium' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >Medium</button>
+
+
+          <button onClick={() => setFilter('low')}
+
+           className={`text-sm font-bold  border-b-2 ${filter === 'low' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >Low</button>
+
+          
 
         </div>
 
@@ -191,7 +215,7 @@ export default function Home() {
 
   
             {filterTodos.map((todo) => (
-              
+
               <li className= {` flex items-center p-4 rounded-lg border border-slate-500 cursor-pointer `}
               
               
