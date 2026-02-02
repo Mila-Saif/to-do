@@ -23,10 +23,24 @@ export default function Home() {
     try {
       const shareData = decodeURIComponent(shareEncodedData);
       const shareTodos = JSON.parse(shareData);
-      setTodos(shareTodos);
-    } catch (error) {
-      console.error('Error decoding shared data:', error);
+
+      const tasksIds = shareTodos.map((task: any) => ({
+        ...task,
+        id: crypto.randomUUID()
+      }));
+
+
+      setTodos((prev) => [...prev, ...tasksIds]);
+
+      window.history.replaceState(null, '', window.location.pathname);
+    } catch (e) {
+      console.error(e);
     }
+  }
+
+  const storedTodos = localStorage.getItem('todos');
+  if (storedTodos) {
+    setTodos(JSON.parse(storedTodos));
   }
   
     
@@ -70,7 +84,7 @@ useEffect(() => {
     }));
     const dataString = JSON.stringify(todosToShare);
     const encodedData = encodeURIComponent(dataString);
-    const shareUrl = `$window.location.origin}${window.location.pathname}?tasks=${encodedData}`;
+    const shareUrl =  `${window.location.origin}${window.location.pathname}?tasks=${encodedData}`;
     navigator.clipboard.writeText(shareUrl);
     setIsCopied(true);
     setTimeout(() => {
@@ -161,7 +175,7 @@ useEffect(() => {
         {/* the header logo and title */}
 
         <div className="absolute left-4 top-4 flex items-center gap-2">
-          <CircleCheckBig className='w-8 h-8' width={54} height={54}/>
+          <CircleCheckBig className='w-6 h-6' />
           <span className='text-xl font-semibold mt-1'>To Do List</span>
 
         </div>
@@ -174,7 +188,7 @@ useEffect(() => {
           <h2 className='text-lg  text-gray-500 uppercase tracking-widest mb-3'> your tasks</h2>
 
           {/* the share button */}
-          <div className='flex items-end justify-between gap-2'>
+          <div className='flex items-end justify-between mb-4 gap-2'>
 
             <span className='text-sm text-gray-500'>
               { filterTodos.length} {filterTodos.length === 1 ? 'Tasks' : 'Tasks'  }
@@ -208,7 +222,7 @@ useEffect(() => {
           <div className='h-px bg-gray-700 w-full'></div>
         </div>
 
-        <div className='flex items-center pt-5 pb-4 gap-8  mb-6'>
+        <div className='flex items-center pt-5 pb-4 gap-8  md:gap-6 mb-6 overflow-x-auto whitespace-nowrap w-full'>
 
 
 
@@ -257,11 +271,11 @@ useEffect(() => {
             e.preventDefault();
             setIsModaleOpen(true);
           }}>
-            <input className='w-full p-2 outline-none border-non text-gray-400' type="text"
+            <input className='w-full pl-3 pr-2 py-2 outline-none border-non text-gray-400' type="text"
               placeholder='Enter your task' value={taskInput} onChange={(e) => setTaskInput(e.target.value)}/>
            <button
            type='submit'
-           className={` bg-blue-500 hover:bg-blue-700 text-white font-bold  py-2 px-4 rounded  $ {isModaleOpen ? 'bg-blue-700' : ''}`}
+           className={` bg-blue-500 hover:bg-blue-700 text-white font-bold  py-2 px-4 rounded-lg transition-colors shrink-0  $ {isModaleOpen ? 'bg-blue-700' : ''}`}
           
 
            
@@ -345,19 +359,19 @@ useEffect(() => {
               
               
                 onClick={() => handleToggleTask(todo.id)} key={todo.id}>
-                <div className='flex items-center gap-1' >
+                <div className='flex items-center gap-2 flex-1 min-w-0' >
                   {todo.completed ? (
-                  <CircleCheckBig className='w-4 h-4 ' />
+                  <CircleCheckBig className='w-4 h-4 shrink-0' />
                 ) : (
-                  <Circle className='w-4 h-4' />
+                  <Circle className='w-4 h-4 shrink-0' />
                 
                 )}
-                 <span className={ `pl-2 ${todo.completed ? 'line-through' : ''}`}>{todo.text}</span>
+                 <span className={ `pl-2 break-all ${todo.completed ? 'line-through' : ''}`}>{todo.text}</span>
 
                 
                 </div>
 
-                <div className='flex items-center gap-4 ml-auto'>
+                <div className='flex items-center gap-2 md:gap-4 ml-auto shrink-0'>
 
                   
                   <div className='flex flex-row'>
