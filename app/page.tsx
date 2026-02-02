@@ -1,5 +1,7 @@
 'use client'
 import { CircleCheckBig, Plus, Circle, Trash }from 'lucide-react';
+
+
 import { useState } from 'react';
 
 
@@ -26,6 +28,26 @@ export default function Home() {
     setPriority('medium');
     
   }
+
+  const handleToggleAll = () => {
+    const AllCompleted = filterTodos.every((todo) => todo.completed);
+
+    const newTodos = todos.map((todo) => {
+
+    const isFiltered = filterTodos.some((fillteredItem) => fillteredItem.id === todo.id);
+    if (isFiltered) {
+      return {
+        ...todo,
+        completed: !AllCompleted,
+      };
+    }
+    return todo;
+      });
+
+    setTodos(newTodos);
+  }
+      
+
 
   const handleToggleTask = (id: string) => {
     const newTodos = todos.map((todo) => {
@@ -105,6 +127,7 @@ export default function Home() {
 
 
 
+
           <button onClick={() => setFilter('all')} 
           className={`text-sm font-bold  border-b-2 ${filter === 'all' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >All</button>
 
@@ -135,6 +158,8 @@ export default function Home() {
 
 
         {/* close the to do list content */}
+
+
 
       
 
@@ -202,8 +227,23 @@ export default function Home() {
             
           )}
 
-           
+          <button
+          onClick={() => handleToggleAll()} className=" flex flex-row gap-2 mt-8 text-sm font-bold text-gray-500 hover:text-white"
+          >
+            {filterTodos.length > 0 && filterTodos.every((todo) => todo.completed) ?  (
+                  <CircleCheckBig className='w-4 h-4 ' />
+                ) : (
+                  <Circle className='w-4 h-4' />
+                
+                )}
 
+            <span>Mark all as done</span>
+
+            
+          </button>
+
+
+          
 
 
           
@@ -211,7 +251,7 @@ export default function Home() {
 
      
 
-           <ul className='mt-9 flex flex-col gap-3'  >
+           <ul className='mt-4 flex flex-col gap-3'  >
 
   
             {filterTodos.map((todo) => (
