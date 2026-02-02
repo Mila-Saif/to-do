@@ -1,18 +1,31 @@
 'use client'
-import { CircleCheckBig, Plus, Circle, Trash }from 'lucide-react';
+import { CircleCheckBig, Circle, Trash }from 'lucide-react';
 
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 
 
 
 export default function Home() {
+
   const [taskInput, setTaskInput] = useState('');
   const [todos, setTodos] = useState<{id: string, text: string, completed:boolean, priority: string}[]>([]);
   const [priority, setPriority] = useState('medium');
   const [isModaleOpen, setIsModaleOpen] = useState(false);
   const [filter, setFilter] = useState('all');
+
+  useEffect(() => {
+  const storedTodos = localStorage.getItem('todos');
+  if (storedTodos) {
+    setTodos(JSON.parse(storedTodos));
+  }
+}, []);
+
+useEffect(() => {
+  localStorage.setItem('todos', JSON.stringify(todos));
+}, [todos]);
+
 
   const handleSaveTask= () => {
     if (!taskInput.trim()) return;
