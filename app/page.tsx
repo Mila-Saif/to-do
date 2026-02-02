@@ -23,10 +23,24 @@ export default function Home() {
     try {
       const shareData = decodeURIComponent(shareEncodedData);
       const shareTodos = JSON.parse(shareData);
-      setTodos(shareTodos);
-    } catch (error) {
-      console.error('Error decoding shared data:', error);
+
+      const tasksIds = shareTodos.map((task: any) => ({
+        ...task,
+        id: crypto.randomUUID()
+      }));
+
+
+      setTodos((prev) => [...prev, ...tasksIds]);
+
+      window.history.replaceState(null, '', window.location.pathname);
+    } catch (e) {
+      console.error(e);
     }
+  }
+
+  const storedTodos = localStorage.getItem('todos');
+  if (storedTodos) {
+    setTodos(JSON.parse(storedTodos));
   }
   
     
@@ -70,7 +84,7 @@ useEffect(() => {
     }));
     const dataString = JSON.stringify(todosToShare);
     const encodedData = encodeURIComponent(dataString);
-    const shareUrl = `$window.location.origin}${window.location.pathname}?tasks=${encodedData}`;
+    const shareUrl =  `${window.location.origin}${window.location.pathname}?tasks=${encodedData}`;
     navigator.clipboard.writeText(shareUrl);
     setIsCopied(true);
     setTimeout(() => {
