@@ -29,6 +29,13 @@ useEffect(() => {
 
   const handleSaveTask= () => {
     if (!taskInput.trim()) return;
+    const isDuplicated = todos.some(
+      (todo) => todo.text.toLowerCase().trim() === taskInput.toLowerCase().trim()
+    );
+    if (isDuplicated) {
+      alert('Task already exists');
+      return;
+    }
       const newTask = {
         id: crypto.randomUUID(),
         text: taskInput,
