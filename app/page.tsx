@@ -1,19 +1,51 @@
 'use client'
-import { CircleCheckBig, Plus, Circle, Trash }from 'lucide-react';
-import { useState } from 'react';
+import { CircleCheckBig, Circle, Trash, Share2, Check }from 'lucide-react';
+
+
+import { useState, useEffect } from 'react';
 
 
 
 
 export default function Home() {
+
   const [taskInput, setTaskInput] = useState('');
   const [todos, setTodos] = useState<{id: string, text: string, completed:boolean, priority: string}[]>([]);
-  const [priority, setPriority] = useState('meduim');
+  const [priority, setPriority] = useState('medium');
   const [isModaleOpen, setIsModaleOpen] = useState(false);
   const [filter, setFilter] = useState('all');
+  const [isCopied, setIsCopied] = useState(false);
+
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const shareEncodedData = params.get('tasks');
+  if (shareEncodedData) {
+    try {
+      const shareData = decodeURIComponent(shareEncodedData);
+      const shareTodos = JSON.parse(shareData);
+      setTodos(shareTodos);
+    } catch (error) {
+      console.error('Error decoding shared data:', error);
+    }
+  }
+  
+    
+}, []);
+
+useEffect(() => {
+  localStorage.setItem('todos', JSON.stringify(todos));
+}, [todos]);
+
 
   const handleSaveTask= () => {
     if (!taskInput.trim()) return;
+    const isDuplicated = todos.some(
+      (todo) => todo.text.toLowerCase().trim() === taskInput.toLowerCase().trim()
+    );
+    if (isDuplicated) {
+      alert('Task already exists');
+      return;
+    }
       const newTask = {
         id: crypto.randomUUID(),
         text: taskInput,
@@ -23,9 +55,51 @@ export default function Home() {
       }
     setTaskInput('');
     setTodos([...todos, newTask]);
-    setPriority('meduim');
+    setPriority('medium');
     
   }
+  const handleShareTodos = () => {
+    if (todos.length === 0) {
+      alert('No todos to share');
+      return;
+    }
+    const todosToShare = todos.map((todo) => ({
+      text: todo.text,
+      completed: todo.completed,
+      priority: todo.priority,
+    }));
+    const dataString = JSON.stringify(todosToShare);
+    const encodedData = encodeURIComponent(dataString);
+    const shareUrl = `$window.location.origin}${window.location.pathname}?tasks=${encodedData}`;
+    navigator.clipboard.writeText(shareUrl);
+    setIsCopied(true);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
+    
+
+
+  };
+
+  const handleToggleAll = () => {
+    const AllCompleted = filterTodos.every((todo) => todo.completed);
+
+    const newTodos = todos.map((todo) => {
+
+    const isFiltered = filterTodos.some((fillteredItem) => fillteredItem.id === todo.id);
+    if (isFiltered) {
+      return {
+        ...todo,
+        completed: !AllCompleted,
+      };
+    }
+    return todo;
+      });
+
+    setTodos(newTodos);
+  }
+      
+
 
   const handleToggleTask = (id: string) => {
     const newTodos = todos.map((todo) => {
@@ -33,6 +107,7 @@ export default function Home() {
         return {
           ...todo,
           completed: !todo.completed,
+          
         }
       }
       return todo;
@@ -51,6 +126,14 @@ export default function Home() {
       return !todo.completed;
     }else if (filter === 'done') {
       return todo.completed;
+    }else if (filter === 'high') {
+      return todo.priority === "high";
+    }else if (filter === 'medium') {
+      return todo.priority === "medium";
+    }else if (filter === 'low') {
+      return todo.priority === "low";
+
+    
     }else {
       return true;
     }
@@ -89,10 +172,44 @@ export default function Home() {
         {/* the to do list content */}
         <div className='mt-12'>
           <h2 className='text-lg  text-gray-500 uppercase tracking-widest mb-3'> your tasks</h2>
+
+          {/* the share button */}
+          <div className='flex items-end justify-between gap-2'>
+
+            <span className='text-sm text-gray-500'>
+              { filterTodos.length} {filterTodos.length === 1 ? 'Tasks' : 'Tasks'  }
+            </span>
+            <button  onClick={handleShareTodos}
+            className='text-sm text-blue-500 flex items-center gap-1'>
+              {isCopied ? (
+                <>
+                <Check className='w-4 h-4' />
+                <span>Link is copied</span>
+
+                
+                </>
+              ) : (
+                <>
+                <Share2 className='w-4 h-4' />
+                <span>Share</span>
+                </>
+              
+              )}
+             
+            </button>
+
+
+          </div>
+
+          {/* the share button end card */}
+
+
+
           <div className='h-px bg-gray-700 w-full'></div>
         </div>
 
         <div className='flex items-center pt-5 pb-4 gap-8  mb-6'>
+
 
 
 
@@ -107,10 +224,27 @@ export default function Home() {
           <button onClick={() => setFilter('done')} 
           className={`text-sm font-bold  border-b-2 ${filter === 'done' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >Done</button>
 
+
+          <button onClick={() => setFilter('high')} 
+          className={`text-sm font-bold  border-b-2 ${filter === 'high' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >High</button>
+
+
+          <button onClick={() => setFilter('medium')} 
+          className={`text-sm font-bold  border-b-2 ${filter === 'medium' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >Medium</button>
+
+
+          <button onClick={() => setFilter('low')}
+
+           className={`text-sm font-bold  border-b-2 ${filter === 'low' ? 'border-blue-500' : 'border-transparent'} -mb-px`} >Low</button>
+
+          
+
         </div>
 
 
         {/* close the to do list content */}
+
+
 
       
 
@@ -178,8 +312,23 @@ export default function Home() {
             
           )}
 
-           
+          <button
+          onClick={() => handleToggleAll()} className=" flex flex-row gap-2 mt-8 text-sm font-bold text-gray-500 hover:text-white"
+          >
+            {filterTodos.length > 0 && filterTodos.every((todo) => todo.completed) ?  (
+                  <CircleCheckBig className='w-4 h-4 ' />
+                ) : (
+                  <Circle className='w-4 h-4' />
+                
+                )}
 
+            <span>Mark all as done</span>
+
+            
+          </button>
+
+
+          
 
 
           
@@ -187,11 +336,11 @@ export default function Home() {
 
      
 
-           <ul className='mt-9 flex flex-col gap-3'  >
+           <ul className='mt-4 flex flex-col gap-3'  >
 
   
             {filterTodos.map((todo) => (
-              
+
               <li className= {` flex items-center p-4 rounded-lg border border-slate-500 cursor-pointer `}
               
               
