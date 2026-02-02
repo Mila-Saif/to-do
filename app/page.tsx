@@ -1,5 +1,5 @@
 'use client'
-import { CircleCheckBig, Circle, Trash }from 'lucide-react';
+import { CircleCheckBig, Circle, Trash, Share2, Check }from 'lucide-react';
 
 
 import { useState, useEffect } from 'react';
@@ -14,12 +14,22 @@ export default function Home() {
   const [priority, setPriority] = useState('medium');
   const [isModaleOpen, setIsModaleOpen] = useState(false);
   const [filter, setFilter] = useState('all');
+  const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
-  const storedTodos = localStorage.getItem('todos');
-  if (storedTodos) {
-    setTodos(JSON.parse(storedTodos));
+  const params = new URLSearchParams(window.location.search);
+  const shareEncodedData = params.get('tasks');
+  if (shareEncodedData) {
+    try {
+      const shareData = decodeURIComponent(shareEncodedData);
+      const shareTodos = JSON.parse(shareData);
+      setTodos(shareTodos);
+    } catch (error) {
+      console.error('Error decoding shared data:', error);
+    }
   }
+  
+    
 }, []);
 
 useEffect(() => {
@@ -48,6 +58,28 @@ useEffect(() => {
     setPriority('medium');
     
   }
+  const handleShareTodos = () => {
+    if (todos.length === 0) {
+      alert('No todos to share');
+      return;
+    }
+    const todosToShare = todos.map((todo) => ({
+      text: todo.text,
+      completed: todo.completed,
+      priority: todo.priority,
+    }));
+    const dataString = JSON.stringify(todosToShare);
+    const encodedData = encodeURIComponent(dataString);
+    const shareUrl = `$window.location.origin}${window.location.pathname}?tasks=${encodedData}`;
+    navigator.clipboard.writeText(shareUrl);
+    setIsCopied(true);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
+    
+
+
+  };
 
   const handleToggleAll = () => {
     const AllCompleted = filterTodos.every((todo) => todo.completed);
@@ -140,6 +172,39 @@ useEffect(() => {
         {/* the to do list content */}
         <div className='mt-12'>
           <h2 className='text-lg  text-gray-500 uppercase tracking-widest mb-3'> your tasks</h2>
+
+          {/* the share button */}
+          <div className='flex items-end justify-between gap-2'>
+
+            <span className='text-sm text-gray-500'>
+              { filterTodos.length} {filterTodos.length === 1 ? 'Tasks' : 'Tasks'  }
+            </span>
+            <button  onClick={handleShareTodos}
+            className='text-sm text-blue-500 flex items-center gap-1'>
+              {isCopied ? (
+                <>
+                <Check className='w-4 h-4' />
+                <span>Link is copied</span>
+
+                
+                </>
+              ) : (
+                <>
+                <Share2 className='w-4 h-4' />
+                <span>Share</span>
+                </>
+              
+              )}
+             
+            </button>
+
+
+          </div>
+
+          {/* the share button end card */}
+
+
+
           <div className='h-px bg-gray-700 w-full'></div>
         </div>
 
